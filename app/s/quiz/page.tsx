@@ -76,10 +76,20 @@ const QuizPage = () => {
               (q) => !answeredQuestions.includes(q.id)
             );
 
-            setQuestions(unansweredQuestions);
+            // Shuffle the unanswered questions
+            const shuffledQuestions = [...unansweredQuestions];
+            for (let i = shuffledQuestions.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [shuffledQuestions[i], shuffledQuestions[j]] = [
+                shuffledQuestions[j],
+                shuffledQuestions[i],
+              ];
+            }
 
-            if (unansweredQuestions.length > 0) {
-              incrementViewCount(unansweredQuestions[0].id);
+            setQuestions(shuffledQuestions);
+
+            if (shuffledQuestions.length > 0) {
+              incrementViewCount(shuffledQuestions[0].id);
             } else {
               toast.info("You have answered all the questions!");
               router.push("/s/player-dashboard");
@@ -214,7 +224,9 @@ const QuizPage = () => {
           </div>
         </CardHeader>
         <CardContent className="space-y-6 pt-6">
-          <p className="text-lg text-center font-semibold">Question {currentQuestionIndex + 1}</p>
+          <p className="text-lg text-center font-semibold">
+            Question {currentQuestionIndex + 1}
+          </p>
           <p className="text-lg">{currentQuestion.question}</p>
           <div className="flex gap-2">
             <Input
@@ -245,7 +257,9 @@ const QuizPage = () => {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
               >
-                <CardTitle className="text-6xl font-bold text-red-400 tracking-wider">GAME OVER</CardTitle>
+                <CardTitle className="text-6xl font-bold text-red-400 tracking-wider">
+                  GAME OVER
+                </CardTitle>
               </motion.div>
             </CardHeader>
             <CardContent className="text-center mt-4 flex flex-col items-center gap-8">
@@ -302,7 +316,9 @@ const QuizPage = () => {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
               >
-                <CardTitle className="text-5xl font-bold text-green-400 tracking-wider">SUCCESS!</CardTitle>
+                <CardTitle className="text-5xl font-bold text-green-400 tracking-wider">
+                  SUCCESS!
+                </CardTitle>
               </motion.div>
             </CardHeader>
             <CardContent className="text-center mt-4 flex flex-col md:flex-row items-center gap-8">
@@ -320,7 +336,8 @@ const QuizPage = () => {
                 transition={{ delay: 0.6, duration: 0.5 }}
               >
                 <p className="text-lg text-gray-300 mb-6">
-                  You have conquered the quiz! Your knowledge is legendary. Now, go forth and share your epic tale of victory!
+                  You have conquered the quiz! Your knowledge is legendary. Now,
+                  go forth and share your epic tale of victory!
                 </p>
                 <Button
                   onClick={() => router.push("/s/player-dashboard")}

@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
     
 
     const prompt = `
-You are an expert question generator for company assessments. I need you to research and analyze the following company thoroughly, then generate exactly ${numberOfQuestions} insightful, relevant questions. Each question must be answerable with a single word. You must also provide the correct single-word answer for each question.
+You are a master strategist and business analyst. Your task is to generate exceptionally insightful questions about a company, based on deep analysis of its website and business model. These questions should be answerable with a single, precise word, revealing a core aspect of the company's strategy, market positioning, or unique value proposition.
 
 Company Information:
 - Company Name: ${companyName}
@@ -76,18 +76,23 @@ Company Information:
 - Company Description: ${companyDescription}
 
 Web Search Context:
-Here is some context from a web search about the company:
 ${searchContext}
 
 Instructions:
-1. First, analyze the provided Web Search Context and the company's website (${website}) to understand their business, services, products, and operations.
-2. Use all available information to understand their domain.
-3. Generate exactly ${numberOfQuestions} questions.
-4. Each question must be answerable with a single word.
-5. For each question, provide a correct, single-word answer.
-6. The answer must be in lowercase.
-7. Questions should be relevant to the company's business, services, or domain.
-8. When referring to the company, always use its name, '${companyName}', instead of pronouns like 'they' or 'it'.
+1.  **Deep Analysis:** Thoroughly analyze the company's website (${website}) and the provided web search context. Go beyond surface-level information. Synthesize the data to understand the company's core business, its target audience, its revenue model, and what makes it unique.
+2.  **Generate Core Questions:** Create exactly ${numberOfQuestions} questions that cut to the heart of the company's operations. Think about what a competitor, investor, or a brilliant new hire would need to know.
+3.  **Single-Word Answers:** Each question MUST be answerable with a single, specific word. This word should be a key term, a brand name, a core value, or a critical metric.
+4.  **Provide the Answer:** For each question, provide the correct single-word answer in lowercase.
+5.  **Avoid Generic Questions:** Do NOT ask questions that could apply to any company (e.g., "What is the company's goal?"). The questions must be specific to '${companyName}'.
+6.  **Use Company Name:** When referring to the company, always use its name, '${companyName}'.
+
+**Example of a GOOD Question (for a fictional company 'Innovatech'):**
+*   Question: "What is the core methodology that drives Innovatech's product development?"
+*   Answer: "agile"
+
+**Example of a BAD Question:**
+*   Question: "Does Innovatech value its customers?"
+*   Answer: "yes"
 
 Format your response ONLY as a JSON array with this exact structure:
 [
