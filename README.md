@@ -1,14 +1,14 @@
-# DeMarket
+# DeMarketIze
 
-**DeMarket is a revolutionary platform that gamifies market research and rewards users for their participation. It's a decentralized application that connects companies seeking market insights with a global community of players ready to provide valuable data.**
+**DeMarketIze is a revolutionary platform that gamifies market research and rewards users for their participation. It's a decentralized application that connects companies seeking market insights with a global community of players ready to provide valuable data.**
 
 ## The Problem
 
 Traditional market research is often slow, expensive, and struggles to engage participants. Companies face challenges in obtaining authentic data, while users are rarely compensated for their time and insights.
 
-## The DeMarket Solution
+## The DeMarketIze Solution
 
-DeMarket transforms market research into an interactive and rewarding experience. Here's how:
+DeMarketIze transforms market research into an interactive and rewarding experience. Here's how:
 
 *   **Engaging Quizzes:** Companies can create and deploy quizzes to gather specific market data.
 *   **Player Participation:** Users ("players") can participate in these quizzes, test their knowledge, and share their opinions.
@@ -59,4 +59,4 @@ We will focus on crypto-native communities and individuals active in the "play-t
 *   **UI Components:** Shadcn UI
 
 
-**DeMarket is more than just a market research tool; it's a community-driven ecosystem where everyone wins. Join us in reshaping the future of data and insights!**
+**DeMarketIze is more than just a market research tool; it's a community-driven ecosystem where everyone wins. Join us in reshaping the future of data and insights!**

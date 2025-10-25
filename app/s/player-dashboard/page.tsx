@@ -285,7 +285,7 @@ const PlayerDashboardPage = () => {
                 </div>
               )}
 
-              <div className="text-center mt-10">
+              <div className="text-center mt-10 flex justify-center gap-4">
                 {playerData.isStaked ? (
                   <InteractiveHoverButton
                     onClick={() => {
@@ -329,6 +329,12 @@ const PlayerDashboardPage = () => {
                     </DialogContent>
                   </Dialog>
                 )}
+                <InteractiveHoverButton
+                  onClick={() => router.push("/s/leaderboard")}
+                  className="text-lg px-8 py-3"
+                >
+                  Leaderboard
+                </InteractiveHoverButton>
               </div>
             </div>
           </div>
