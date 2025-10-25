@@ -24,10 +24,11 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 
 const QuestionsPage = () => {
   const [user, setUser] = useState<User | null>(null);
-  const [questions, setQuestions] = useState<{ question: string; answer: string }[]>([]);
+  const [questions, setQuestions] = useState<DocumentData[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -43,7 +44,13 @@ const QuestionsPage = () => {
         if (!querySnapshot.empty) {
           const companyDoc = querySnapshot.docs[0];
           if (companyDoc.data().questions) {
-            setQuestions(companyDoc.data().questions);
+            const questionsQuery = query(
+              collection(db, "questions"),
+              where("companyId", "==", companyDoc.id)
+            );
+            const questionsSnapshot = await getDocs(questionsQuery);
+            const questionsData = questionsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setQuestions(questionsData);
           }
         }
         setLoading(false);
@@ -61,7 +68,7 @@ const QuestionsPage = () => {
     value: string
   ) => {
     const newQuestions = [...questions];
-    newQuestions[index] = { ...newQuestions[index], [field]: value };
+    newQuestions[index][field] = value;
     setQuestions(newQuestions);
   };
 
@@ -69,23 +76,14 @@ const QuestionsPage = () => {
     if (!user) return;
     setSaving(true);
     try {
-      const companyQuery = query(
-        collection(db, "company"),
-        where("authUid", "==", user.uid)
-      );
-      const querySnapshot = await getDocs(companyQuery);
-      if (!querySnapshot.empty) {
-        const companyDoc = querySnapshot.docs[0];
-        const userDocRef = doc(db, "company", companyDoc.id);
-        const questionsToSave = questions.map(q => ({
-          ...q,
-          answer: q.answer.toLowerCase()
-        }));
-        await updateDoc(userDocRef, { questions: questionsToSave });
-        toast.success("Questions saved successfully!");
-      } else {
-        toast.error("Company profile not found.");
+      for (const q of questions) {
+        const questionRef = doc(db, "questions", q.id);
+        await updateDoc(questionRef, {
+          question: q.question,
+          answer: q.answer.toLowerCase(),
+        });
       }
+      toast.success("Questions saved successfully!");
     } catch (error) {
       toast.error("Failed to save questions.");
       console.error("Error saving questions:", error);
@@ -126,8 +124,9 @@ const QuestionsPage = () => {
                   <div className="p-4">
                     <Card className="bg-white/10 border border-gray-200/20 backdrop-blur-lg rounded-lg shadow-lg">
                       <CardHeader>
-                        <CardTitle className="text-lg font-semibold">
-                          Question {index + 1}
+                        <CardTitle className="text-lg font-semibold flex justify-between items-center">
+                          <span>Question {index + 1}</span>
+                          <Badge>{q.viewCount} views</Badge>
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4">

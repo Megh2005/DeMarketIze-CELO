@@ -138,6 +138,7 @@ IMPORTANT: Respond ONLY with the JSON array, no additional text or explanation.
           question: q.question,
           answer: q.answer.toLowerCase(),
           createdAt: serverTimestamp(),
+          viewCount: 0,
         });
         savedQuestions.push({ id: docRef.id, ...q });
       } catch (error) {

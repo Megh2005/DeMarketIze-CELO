@@ -30,6 +30,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 import {
   Heart,
   HelpCircle,
@@ -51,6 +52,11 @@ const PlayerDashboardPage = () => {
   const [playerDocId, setPlayerDocId] = useState<string | null>(null);
   const [contract, setContract] = useState<ethers.Contract | null>(null);
   const [stakingLoading, setStakingLoading] = useState<boolean>(false);
+  const [isGameOverModalOpen, setIsGameOverModalOpen] = useState(false);
+  const [isGameCompletedModalOpen, setIsGameCompletedModalOpen] = useState(false);
+
+  const openGameOverModal = () => setIsGameOverModalOpen(true);
+  const openGameCompletedModal = () => setIsGameCompletedModalOpen(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -267,13 +273,33 @@ const PlayerDashboardPage = () => {
                 </div>
               </div>
 
+              {playerData.bio && (
+                <div className="mt-8">
+                  <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
+                    <UserIcon size={20} />
+                    Player Bio
+                  </h3>
+                  <p className="text-gray-300 bg-black/20 p-4 rounded-md">
+                    {playerData.bio}
+                  </p>
+                </div>
+              )}
+
               <div className="text-center mt-10">
                 {playerData.isStaked ? (
                   <InteractiveHoverButton
-                    onClick={() => toast.warning("Quiz functionality coming soon!")}
+                    onClick={() => {
+                      if (playerData.life <= 0) {
+                        openGameOverModal();
+                      } else if (playerData.answered >= playerData.assignedQuestions) {
+                        openGameCompletedModal();
+                      } else {
+                        router.push("/s/quiz");
+                      }
+                    }}
                     className="text-lg px-8 py-3"
                   >
-                    Start Quiz
+                    {playerData.life <= 0 ? "Game Over" : playerData.answered >= playerData.assignedQuestions ? "Game Completed" : "Start Quiz"}
                   </InteractiveHoverButton>
                 ) : (
                   <Dialog>
@@ -307,6 +333,111 @@ const PlayerDashboardPage = () => {
             </div>
           </div>
         </Card>
+
+        {isGameOverModalOpen && (
+          <motion.div
+            className="absolute inset-0 bg-black/80 flex items-center justify-center z-50"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card className="bg-gradient-to-br from-red-500/20 to-purple-600/20 border border-red-500/50 backdrop-blur-lg rounded-2xl shadow-2xl text-white p-8 w-full max-w-md">
+              <CardHeader className="text-center">
+                <motion.div
+                  initial={{ y: -50, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.2, duration: 0.5 }}
+                >
+                  <CardTitle className="text-6xl font-bold text-red-400 tracking-wider">GAME OVER</CardTitle>
+                </motion.div>
+              </CardHeader>
+              <CardContent className="text-center mt-4 flex flex-col items-center gap-8">
+                <motion.div
+                  className="w-48 h-48 relative"
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.4, duration: 0.5 }}
+                >
+                  <Image
+                    src="https://robohash.org/meme.png?set=set4"
+                    alt="Game Over Meme"
+                    layout="fill"
+                    objectFit="cover"
+                    className="rounded-lg"
+                  />
+                </motion.div>
+                <motion.p
+                  className="text-xl mb-6 text-gray-300"
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.4, duration: 0.5 }}
+                >
+                  You have run out of lives.
+                </motion.p>
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.6, duration: 0.5 }}
+                >
+                  <Button
+                    onClick={() => setIsGameOverModalOpen(false)}
+                    className="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-red-500/50"
+                  >
+                    Close
+                  </Button>
+                </motion.div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+        {isGameCompletedModalOpen && (
+          <motion.div
+            className="absolute inset-0 bg-black/80 flex items-center justify-center z-50"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card className="bg-gradient-to-br from-green-500/20 to-blue-600/20 border border-green-500/50 backdrop-blur-lg rounded-2xl shadow-2xl text-white p-8 w-full max-w-2xl">
+              <CardHeader className="text-center">
+                <motion.div
+                  initial={{ y: -50, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.2, duration: 0.5 }}
+                >
+                  <CardTitle className="text-5xl font-bold text-green-400 tracking-wider">SUCCESS!</CardTitle>
+                </motion.div>
+              </CardHeader>
+              <CardContent className="text-center mt-4 flex flex-col md:flex-row items-center gap-8">
+                <motion.div
+                  className="w-48 h-48 bg-gray-700 rounded-lg flex-shrink-0"
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.4, duration: 0.5 }}
+                >
+                  {/* Placeholder for meme image */}
+                </motion.div>
+                <motion.div
+                  initial={{ x: 50, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.6, duration: 0.5 }}
+                >
+                  <p className="text-lg text-gray-300 mb-6">
+                    You have conquered the quiz! Your knowledge is legendary. Now, go forth and share your epic tale of victory!
+                  </p>
+                  <Button
+                    onClick={() => setIsGameCompletedModalOpen(false)}
+                    className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-green-500/50"
+                  >
+                    Close
+                  </Button>
+                </motion.div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
       </div>
     </div>
   );
