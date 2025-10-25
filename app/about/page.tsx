@@ -2,64 +2,113 @@
 
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { onAuthStateChanged } from "firebase/auth";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { auth, db } from "@/lib/firebase";
-import { Skeleton } from "@/components/ui/skeleton";
+import React from "react";
+import Image from "next/image";
 
 const HomePage: React.FC = () => {
-  const router = useRouter();
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const q = query(
-          collection(db, "company"),
-          where("authUid", "==", user.uid)
-        );
-        const querySnapshot = await getDocs(q);
-        if (!querySnapshot.empty) {
-          router.push("/s/dashboard");
-        } else {
-          setLoading(false);
-        }
-      } else {
-        setLoading(false);
-      }
-    });
-
-    return () => unsubscribe();
-  }, [router]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <div className="w-full max-w-md text-center">
-          <Skeleton className="h-12 w-3/4 mx-auto mb-4" />
-          <Skeleton className="h-8 w-1/2 mx-auto" />
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="relative h-screen">
+    <div className="relative min-h-screen">
       {/* Background Pattern */}
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 -z-10 h-full w-full items-center px-5 py-24 [background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]" />
-      </div>
+      <div className="absolute inset-0 -z-10 h-full w-full items-center px-5 py-24 [background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]" />
 
-      {/* Hero Content */}
-      <div className="relative z-10 flex h-full flex-col items-center justify-center px-4">
-        <div className="max-w-3xl text-center">
-          <h1 className="mb-8 text-4xl font-bold sm:text-6xl lg:text-8xl text-white">
-            About <span className="text-sky-400">Us</span>
-          </h1>
-          <div className="flex flex-wrap text-xl justify-center gap-4">
-            <InteractiveHoverButton className="border-2 border-white">
+      {/* Content */}
+      <div className="relative z-10 flex flex-col items-center px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl w-full mx-auto py-16 sm:py-20 lg:py-24">
+          {/* Hero Section */}
+          <div className="text-center mb-20 lg:mb-28">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold text-white mb-6">
+              About <span className="text-sky-400">Us</span>
+            </h1>
+            <p className="text-gray-300 text-lg sm:text-xl max-w-3xl mx-auto">
+              A trustless, on-chain game platform where skills meet stakes.
+              Solve web-scraped challenges from companies through our
+              blockchain-powered LLM agent.
+            </p>
+          </div>
+
+          {/* Feature 1 - Companies */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center mb-20 lg:mb-32">
+            <div className="text-white space-y-6 order-2 lg:order-1">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-sky-400">
+                For Companies
+              </h2>
+              <p className="text-base sm:text-lg lg:text-xl text-gray-300 leading-relaxed">
+                Post real-world challenges sourced from your website data. Our
+                trustless on-chain LLM agent generates unbiased, web-scrape
+                based questions that candidates solve in a competitive,
+                stake-based game environment.
+              </p>
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start">
+                  <span className="text-sky-400 mr-2">✓</span>
+                  <span>Trustless verification through blockchain</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-sky-400 mr-2">✓</span>
+                  <span>AI-generated challenges from your web data</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-sky-400 mr-2">✓</span>
+                  <span>
+                    Discover committed talent through stake-based participation
+                  </span>
+                </li>
+              </ul>
+            </div>
+            <div className="flex items-center justify-center order-1 lg:order-2">
+              <div className="relative w-full max-w-lg aspect-[3/2]">
+                <Image
+                  src="/company.svg"
+                  alt="Companies benefit illustration"
+                  fill
+                  className="rounded-lg object-contain"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Feature 2 - Developers */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center mb-20 lg:mb-32">
+            <div className="flex items-center justify-center order-1">
+              <div className="relative w-full max-w-lg aspect-[3/2]">
+                <Image
+                  src="/dev.svg"
+                  alt="Developers benefit illustration"
+                  fill
+                  className="rounded-lg object-contain"
+                />
+              </div>
+            </div>
+            <div className="text-white space-y-6 order-2">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-sky-400">
+                For Players
+              </h2>
+              <p className="text-base sm:text-lg lg:text-xl text-gray-300 leading-relaxed">
+                Stake tokens, play the Cicada game, and solve challenges
+                generated by our on-chain LLM agent. Prove your skills in a
+                transparent, gamified environment where your success is
+                verifiable on the blockchain.
+              </p>
+              <ul className="space-y-3 text-gray-300">
+                <li className="flex items-start">
+                  <span className="text-sky-400 mr-2">✓</span>
+                  <span>Stake & Play: Put skin in the game</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-sky-400 mr-2">✓</span>
+                  <span>Earn rewards for solving AI-generated challenges</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-sky-400 mr-2">✓</span>
+                  <span>Build verifiable on-chain reputation</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* CTA Section */}
+          <div className="text-center">
+            <InteractiveHoverButton className="border-2 border-white text-lg px-8 py-3">
               <Link href="/s">Get Started</Link>
             </InteractiveHoverButton>
           </div>
