@@ -21,6 +21,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import CircularTimer from "@/components/ui/CircularTimer";
 
 const QuizPage = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -32,7 +33,20 @@ const QuizPage = () => {
   const [userAnswer, setUserAnswer] = useState("");
   const [isGameOver, setIsGameOver] = useState(false);
   const [isQuizComplete, setIsQuizComplete] = useState(false);
+  const [timer, setTimer] = useState(0);
+  const [startTime, setStartTime] = useState(Date.now());
   const router = useRouter();
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimer(Date.now() - startTime);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [startTime]);
+
+  useEffect(() => {
+    setStartTime(Date.now());
+  }, [currentQuestionIndex]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -131,6 +145,7 @@ const QuizPage = () => {
   const handleSubmitAnswer = async () => {
     if (!playerDocId) return;
 
+    const solutionTime = timer / 1000;
     const currentQuestion = questions[currentQuestionIndex];
     const playerRef = doc(db, "players", playerDocId);
 
@@ -142,6 +157,7 @@ const QuizPage = () => {
         score: newScore,
         answered: newAnswered,
         answeredQuestions: arrayUnion(currentQuestion.id),
+        solutionTimes: arrayUnion({ questionId: currentQuestion.id, time: solutionTime }),
       });
       setPlayerData({ ...playerData, score: newScore, answered: newAnswered });
 
@@ -219,6 +235,10 @@ const QuizPage = () => {
               <div className="text-center">
                 <p className="text-sm text-gray-400">Lives</p>
                 <p className="font-bold text-2xl">{playerData?.life}</p>
+              </div>
+
+              <div className="text-center">
+                <CircularTimer time={timer} totalTime={30000} />
               </div>
             </div>
           </div>

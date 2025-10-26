@@ -26,6 +26,11 @@ import {
   LogOut,
   ArrowRight,
 } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { ethers } from "ethers";
+import { ABI } from "@/types/contracts";
 
 const DashboardPage = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -34,6 +39,47 @@ const DashboardPage = () => {
   const [generating, setGenerating] = useState(false);
   const [questionsExist, setQuestionsExist] = useState(false);
   const router = useRouter();
+  const [stakeAmount, setStakeAmount] = useState("");
+  const [contract, setContract] = useState<ethers.Contract | null>(null);
+  const [stakingLoading, setStakingLoading] = useState<boolean>(false);
+  const [totalStaked, setTotalStaked] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (contract) {
+      const fetchTotalStaked = async () => {
+        try {
+          const totalStaked = await contract.totalStaked();
+          setTotalStaked(ethers.formatEther(totalStaked));
+        } catch (error) {
+          console.error("Error fetching total staked:", error);
+        }
+      };
+      fetchTotalStaked();
+    }
+  }, [contract, stakingLoading]);
+
+  useEffect(() => {
+    const initializeProvider = async () => {
+      if (typeof window !== "undefined" && window.ethereum) {
+        try {
+          const web3Provider = new ethers.BrowserProvider(window.ethereum);
+          const accounts = await web3Provider.send("eth_accounts", []);
+          if (accounts.length > 0) {
+            const signerInstance = await web3Provider.getSigner();
+            const contractInstance = new ethers.Contract(
+              process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!,
+              ABI,
+              signerInstance
+            );
+            setContract(contractInstance);
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    };
+    initializeProvider();
+  }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -120,6 +166,32 @@ const DashboardPage = () => {
 
   const handleShowQuestions = () => {
     router.push("/s/questions");
+  };
+
+  const handleStake = async () => {
+    if (!contract) {
+      toast.error("Please connect your wallet first.");
+      return;
+    }
+    if (!stakeAmount || isNaN(parseFloat(stakeAmount))) {
+      toast.error("Please enter a valid amount.");
+      return;
+    }
+
+    const toastId = toast.loading("Staking CELO...");
+    try {
+      setStakingLoading(true);
+      const tx = await contract.stake({
+        value: ethers.parseEther(stakeAmount),
+      });
+      await tx.wait();
+      toast.success("Staking successful!", { id: toastId });
+    } catch (err) {
+      console.error(err);
+      toast.error("Staking failed.", { id: toastId });
+    } finally {
+      setStakingLoading(false);
+    }
   };
 
   if (loading) {
@@ -224,6 +296,12 @@ const DashboardPage = () => {
                     <strong>Wallet:</strong> {companyData.walletAddress}
                   </p>
                 </div>
+                <div className="flex items-center gap-3">
+                  <Wallet size={20} className="text-green-400" />
+                  <p>
+                    <strong>Total Pool:</strong> {totalStaked ? parseFloat(totalStaked).toFixed(1) : '0.0'} CELO
+                  </p>
+                </div>
               </div>
 
               <div className="mt-8">
@@ -236,7 +314,7 @@ const DashboardPage = () => {
                 </p>
               </div>
 
-              <div className="text-center mt-10">
+              <div className="text-center mt-10 flex justify-center gap-4">
                 {questionsExist ? (
                   <InteractiveHoverButton onClick={handleShowQuestions} className="text-lg px-8 py-3">
                     Show Questions
@@ -252,6 +330,35 @@ const DashboardPage = () => {
                       : "Generate Questions"}
                   </InteractiveHoverButton>
                 )}
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <InteractiveHoverButton className="text-lg px-8 py-3">
+                      Add Pool
+                    </InteractiveHoverButton>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px] bg-white/10 border border-gray-200/20 backdrop-blur-lg rounded-lg shadow-lg text-white">
+                    <DialogHeader>
+                      <DialogTitle>Add to Pool</DialogTitle>
+                      <DialogDescription>
+                        Enter the amount of CELO you want to stake.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <Input
+                        id="amount"
+                        value={stakeAmount}
+                        onChange={(e) => setStakeAmount(e.target.value)}
+                        placeholder="Amount in CELO"
+                        className="bg-gray-700 border-gray-600 text-white"
+                      />
+                    </div>
+                    <DialogFooter>
+                      <Button onClick={handleStake} disabled={stakingLoading}>
+                        {stakingLoading ? "Staking..." : "Stake"}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
           </div>

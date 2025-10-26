@@ -1,5 +1,6 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { WalletContext } from "@/context/Wallet";
 import { auth, db } from "@/lib/firebase";
 import { onAuthStateChanged, User, signOut } from "firebase/auth";
 import {
@@ -45,6 +46,7 @@ import {
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!;
 
 const PlayerDashboardPage = () => {
+  const { userAddress } = useContext(WalletContext);
   const [user, setUser] = useState<User | null>(null);
   const [playerData, setPlayerData] = useState<DocumentData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -54,6 +56,22 @@ const PlayerDashboardPage = () => {
   const [stakingLoading, setStakingLoading] = useState<boolean>(false);
   const [isGameOverModalOpen, setIsGameOverModalOpen] = useState(false);
   const [isGameCompletedModalOpen, setIsGameCompletedModalOpen] = useState(false);
+  const [totalStaked, setTotalStaked] = useState<string | null>(null);
+
+  const fetchTotalStaked = async () => {
+    if (contract) {
+      try {
+        const totalStaked = await contract.totalStaked();
+        setTotalStaked(ethers.formatEther(totalStaked));
+      } catch (error) {
+        console.error("Error fetching total staked:", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchTotalStaked();
+  }, [contract]);
 
   const openGameOverModal = () => setIsGameOverModalOpen(true);
   const openGameCompletedModal = () => setIsGameCompletedModalOpen(true);
@@ -210,12 +228,14 @@ const PlayerDashboardPage = () => {
       <div className="max-w-6xl mx-auto">
         <header className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Player Dashboard</h1>
-          <InteractiveHoverButton
-            onClick={handleLogout}
-            className="flex items-center gap-2"
-          >
-            Logout
-          </InteractiveHoverButton>
+          <div>
+            <InteractiveHoverButton
+              onClick={handleLogout}
+              className="flex items-center gap-2"
+            >
+              Logout
+            </InteractiveHoverButton>
+          </div>
         </header>
 
         <Card className="bg-white/10 border border-gray-200/20 backdrop-blur-lg rounded-2xl shadow-lg overflow-hidden">
@@ -254,13 +274,12 @@ const PlayerDashboardPage = () => {
                     <p className="font-bold text-2xl">{playerData.life}</p>
                   </div>
                 </div>
+                
                 <div className="flex items-center gap-3 bg-black/20 p-4 rounded-lg">
-                  <HelpCircle size={24} className="text-sky-400" />
+                  <Wallet size={24} className="text-blue-400" />
                   <div>
-                    <p className="text-sm text-gray-400">Answered</p>
-                    <p className="font-bold text-2xl">
-                      {playerData.answered}/{playerData.assignedQuestions}
-                    </p>
+                    <p className="text-sm text-gray-400">Total Pool</p>
+                    <p className="font-bold text-2xl">{totalStaked ? parseFloat(totalStaked).toFixed(1) : '0.00'} CELO</p>
                   </div>
                 </div>
               </div>

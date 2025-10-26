@@ -10,6 +10,8 @@ interface WalletContextType {
   setUserAddress: (userAddress: string | null) => void;
   signer: any;
   setSigner: (signer: any) => void;
+  balance: string | null;
+  setBalance: (balance: string | null) => void;
 }
 
 export const WalletContext = createContext<WalletContextType>({
@@ -19,9 +21,12 @@ export const WalletContext = createContext<WalletContextType>({
   setUserAddress: () => {},
   signer: null,
   setSigner: () => {},
+  balance: null,
+  setBalance: () => {},
 });
 
 import { ReactNode } from "react";
+import { ethers } from "ethers";
 
 export const WalletContextProvider = ({
   children,
@@ -31,6 +36,7 @@ export const WalletContextProvider = ({
   const [isConnected, setIsConnected] = useState(false);
   const [userAddress, setUserAddress] = useState<string | null>(null);
   const [signer, setSigner] = useState();
+  const [balance, setBalance] = useState<string | null>(null);
 
   return (
     <WalletContext.Provider
@@ -41,6 +47,8 @@ export const WalletContextProvider = ({
         setUserAddress,
         signer,
         setSigner,
+        balance,
+        setBalance,
       }}
     >
       {children}
