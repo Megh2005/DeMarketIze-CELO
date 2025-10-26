@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { auth, db } from "@/lib/firebase";
 import { onAuthStateChanged, User } from "firebase/auth";
 import {
+  DocumentData,
   doc,
   updateDoc,
   query,
