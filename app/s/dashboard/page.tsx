@@ -43,6 +43,31 @@ const DashboardPage = () => {
   const [contract, setContract] = useState<ethers.Contract | null>(null);
   const [stakingLoading, setStakingLoading] = useState<boolean>(false);
   const [totalStaked, setTotalStaked] = useState<string | null>(null);
+  const [balance, setBalance] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (companyData) {
+      const fetchBalance = async () => {
+        try {
+          const response = await fetch("/api/get-balance", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ address: companyData.walletAddress }),
+          });
+          const data = await response.json();
+          if (data.result) {
+            const balanceInEther = ethers.formatEther(data.result);
+            setBalance(balanceInEther);
+          }
+        } catch (error) {
+          console.error("Error fetching balance:", error);
+        }
+      };
+      fetchBalance();
+    }
+  }, [companyData, stakingLoading]);
 
   useEffect(() => {
     if (contract) {
@@ -233,7 +258,10 @@ const DashboardPage = () => {
       <div className="max-w-6xl mx-auto">
         <header className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Company Dashboard</h1>
-          <InteractiveHoverButton onClick={handleLogout} className="flex items-center gap-2">
+          <InteractiveHoverButton
+            onClick={handleLogout}
+            className="flex items-center gap-2"
+          >
             Logout
           </InteractiveHoverButton>
         </header>
@@ -274,7 +302,7 @@ const DashboardPage = () => {
                 <div className="flex items-center gap-3">
                   <Mail size={20} className="text-sky-400" />
                   <p>
-                    <strong>Email:</strong> {companyData.email}
+                    <strong>Email:</strong> {companyData.companyEmail}
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -287,7 +315,9 @@ const DashboardPage = () => {
                   <Hash size={20} className="text-sky-400" />
                   <p>
                     <strong>Questions Required:</strong>
-                    <Badge className="ml-2">{companyData.numberOfQuestions}</Badge>
+                    <Badge className="ml-2">
+                      {companyData.numberOfQuestions}
+                    </Badge>
                   </p>
                 </div>
                 <div className="flex items-center gap-3 col-span-full">
@@ -296,11 +326,27 @@ const DashboardPage = () => {
                     <strong>Wallet:</strong> {companyData.walletAddress}
                   </p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Wallet size={20} className="text-green-400" />
-                  <p>
-                    <strong>Total Pool:</strong> {totalStaked ? parseFloat(totalStaked).toFixed(1) : '0.0'} CELO
-                  </p>
+                <div className="flex items-center gap-3 bg-black/20 p-4 rounded-lg">
+                  <Wallet size={24} className="text-green-400" />
+                  <div>
+                    <p className="text-sm text-gray-400">Balance</p>
+                    <p className="font-bold text-2xl">
+                      {balance ? parseFloat(balance).toFixed(2) : "0.00"} CELO
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 bg-black/20 p-4 rounded-lg">
+                  <Wallet size={24} className="text-blue-400" />
+                  <div>
+                    <p className="text-sm text-gray-400">Total Pool</p>
+                    <p className="font-bold text-2xl">
+                      {totalStaked
+                        ? parseFloat(totalStaked).toFixed(1)
+                        : "0.00"}{" "}
+                      CELO
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -316,7 +362,10 @@ const DashboardPage = () => {
 
               <div className="text-center mt-10 flex justify-center gap-4">
                 {questionsExist ? (
-                  <InteractiveHoverButton onClick={handleShowQuestions} className="text-lg px-8 py-3">
+                  <InteractiveHoverButton
+                    onClick={handleShowQuestions}
+                    className="text-lg px-8 py-3"
+                  >
                     Show Questions
                   </InteractiveHoverButton>
                 ) : (

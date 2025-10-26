@@ -1,5 +1,9 @@
 # DeMarketIze
 
+```
+ADDRESS = 0xcF167f6956252FEFd72ad8c94B376F75BbEfED0e
+```
+
 **DeMarketIze is a revolutionary platform that gamifies market research and rewards users for their participation. It's a decentralized application that connects companies seeking market insights with a global community of players ready to provide valuable data.**
 
 ## The Problem

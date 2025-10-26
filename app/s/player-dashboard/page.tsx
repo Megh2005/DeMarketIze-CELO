@@ -46,7 +46,7 @@ import {
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!;
 
 const PlayerDashboardPage = () => {
-  const { userAddress } = useContext(WalletContext);
+  const { userAddress, balance, setBalance, setUserAddress } = useContext(WalletContext);
   const [user, setUser] = useState<User | null>(null);
   const [playerData, setPlayerData] = useState<DocumentData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -57,6 +57,30 @@ const PlayerDashboardPage = () => {
   const [isGameOverModalOpen, setIsGameOverModalOpen] = useState(false);
   const [isGameCompletedModalOpen, setIsGameCompletedModalOpen] = useState(false);
   const [totalStaked, setTotalStaked] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (playerData) {
+      const fetchBalance = async () => {
+        try {
+          const response = await fetch("/api/get-balance", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ address: playerData.walletAddress }),
+          });
+          const data = await response.json();
+          if (data.result) {
+            const balanceInEther = ethers.formatEther(data.result);
+            setBalance(balanceInEther);
+          }
+        } catch (error) {
+          console.error("Error fetching balance:", error);
+        }
+      };
+      fetchBalance();
+    }
+  }, [playerData, setBalance]);
 
   const fetchTotalStaked = async () => {
     if (contract) {
@@ -272,6 +296,13 @@ const PlayerDashboardPage = () => {
                   <div>
                     <p className="text-sm text-gray-400">Lives</p>
                     <p className="font-bold text-2xl">{playerData.life}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 bg-black/20 p-4 rounded-lg">
+                  <Wallet size={24} className="text-green-400" />
+                  <div>
+                    <p className="text-sm text-gray-400">Balance</p>
+                    <p className="font-bold text-2xl">{balance ? parseFloat(balance).toFixed(2) : '0.00'} CELO</p>
                   </div>
                 </div>
                 
