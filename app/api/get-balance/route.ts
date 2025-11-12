@@ -12,7 +12,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const response = await fetch("https://celo-sepolia.drpc.org", {
+    const response = await fetch("https://celo.drpc.org", {
       method: "POST",
       headers: {
         "accept": "application/json",

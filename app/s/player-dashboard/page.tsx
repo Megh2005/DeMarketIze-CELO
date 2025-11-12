@@ -170,11 +170,11 @@ const PlayerDashboardPage = () => {
   };
 
   const stake = async (contractInstance: ethers.Contract) => {
-    const toastId = toast.loading("Staking 1 CELO...");
+    const toastId = toast.loading("Staking 0.01 CELO...");
     try {
       setStakingLoading(true);
       const tx = await contractInstance.stake({
-        value: ethers.parseEther("1"),
+        value: ethers.parseEther("0.001"),
       });
       await tx.wait();
       if (playerDocId) {
@@ -362,7 +362,7 @@ const PlayerDashboardPage = () => {
                       <DialogHeader>
                         <DialogTitle>Stake to Play</DialogTitle>
                         <DialogDescription>
-                          You need to stake 1 CELO to start the quiz. This is to
+                          You need to stake 0.001 CELO to start the quiz. This is to
                           ensure commitment and participation.
                         </DialogDescription>
                       </DialogHeader>
@@ -373,7 +373,7 @@ const PlayerDashboardPage = () => {
                         >
                           {stakingLoading
                             ? "Staking..."
-                            : "Stake 1 CELO and Play"}
+                            : "Stake 0.001 CELO and Play"}
                         </InteractiveHoverButton>
                       </DialogFooter>
                     </DialogContent>

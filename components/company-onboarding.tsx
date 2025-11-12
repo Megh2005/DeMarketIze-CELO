@@ -191,7 +191,7 @@ const CompanyOnboarding: React.FC<CompanyOnboardingProps> = ({ onClose }) => {
     const toastId = toast.loading("Processing payment...");
     try {
       if (typeof window.ethereum !== "undefined") {
-        const stakeAmount = Number(formData.numberOfQuestions) * 0.1;
+        const stakeAmount = Number(formData.numberOfQuestions) * 0.001;
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);

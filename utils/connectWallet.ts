@@ -8,18 +8,18 @@ declare global {
 }
 
 const CELO_SEPOLIA_PARAMS = {
-    chainId: "0xaa044c",
-    chainName: "Celo Sepolia Testnet",
+    chainId: "0xa4ec",
+    chainName: "Celo Mainnet",
     nativeCurrency: {
         name: "CELO",
         symbol: "CELO",
         decimals: 18,
     },
-    rpcUrls: ["https://rpc.ankr.com/celo_sepolia"],
-    blockExplorerUrls: ["https://sepolia.celoscan.io/"],
+    rpcUrls: ["https://celo-json-rpc.stakely.io"],
+    blockExplorerUrls: ["https://celoscan.io"],
 };
 
-const CELO_SEPOLIA_CHAIN_ID = 11142220;
+const CELO_SEPOLIA_CHAIN_ID = 42220;
 
 // Logging helper with colors
 const log = {
